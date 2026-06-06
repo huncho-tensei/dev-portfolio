@@ -1,0 +1,311 @@
+@import "tailwindcss";
+
+/* Hallmark · macrostructure: Two-Column Spine · tone: stark · anchor hue: kenyan-red
+ * theme: studied-DNA (source: image) · paper oklch(8% 0 0) · accent red oklch(40% 0.19 27)
+ * display: heavy grotesque (Space Grotesk Black) · body: neutral grotesque (Space Grotesk Regular)
+ * studied: yes · DNA-source: user reference (Figma community template)
+ */
+
+@theme {
+  /* Paper */
+  --color-ink: oklch(8% 0 0);
+  --color-ink-raised: oklch(13% 0 0);
+  --color-surface: oklch(17% 0 0);
+
+  /* Text */
+  --color-bone: oklch(97% 0 0);
+  --color-dim: oklch(65% 0 0);
+  --color-faint: oklch(45% 0 0);
+
+  /* Kenyan flag accents */
+  --color-red: oklch(40% 0.19 27);
+  --color-red-soft: oklch(50% 0.17 27);
+  --color-green: oklch(42% 0.14 145);
+  --color-green-soft: oklch(52% 0.13 145);
+
+  /* Explain toggle */
+  --color-explain: oklch(72% 0.12 195);
+
+  /* Fonts */
+  --font-display: var(--font-space);
+  --font-mono: var(--font-jetbrains);
+
+  /* Lines */
+  --color-line: oklch(97% 0 0 / 0.09);
+  --color-line-strong: oklch(97% 0 0 / 0.18);
+}
+
+@layer base {
+  :root {
+    --line: oklch(97% 0 0 / 0.09);
+    --line-strong: oklch(97% 0 0 / 0.18);
+  }
+
+  * {
+    border-color: var(--line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-red);
+    color: var(--color-bone);
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--color-ink); }
+  ::-webkit-scrollbar-thumb {
+    background: oklch(97% 0 0 / 0.12);
+    border: 2px solid var(--color-ink);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: var(--color-red); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-red);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  }
+  .font-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+  }
+
+  .text-balance { text-wrap: balance; }
+  .text-pretty  { text-wrap: pretty; }
+
+  /* growing underline — editorial link treatment */
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+    padding-bottom: 2px;
+  }
+  .link-underline:hover { background-size: 100% 1px; }
+
+  /* pill CTA — primary red */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--color-red);
+    color: var(--color-bone);
+    font-family: var(--font-display), sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 999px;
+    transition: background 0.2s, transform 0.2s;
+  }
+  .btn-primary:hover {
+    background: var(--color-red-soft);
+    transform: translateY(-1px);
+  }
+  .btn-primary:active { transform: translateY(0); }
+
+  /* ghost pill */
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--line-strong);
+    color: var(--color-bone);
+    font-family: var(--font-display), sans-serif;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.65rem 1.5rem;
+    border-radius: 999px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover {
+    border-color: var(--color-bone);
+    color: var(--color-bone);
+  }
+}
+
+/* ---------- Markdown prose ---------- */
+.prose-hawi {
+  font-family: var(--font-display), sans-serif;
+  color: var(--color-dim);
+  font-size: 1.15rem;
+  line-height: 1.75;
+  font-weight: 400;
+}
+.prose-hawi > * + * { margin-top: 1.4rem; }
+.prose-hawi h2 {
+  font-family: var(--font-display), sans-serif;
+  color: var(--color-bone);
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-top: 3rem;
+}
+.prose-hawi h3 {
+  font-family: var(--font-display), sans-serif;
+  color: var(--color-bone);
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-top: 2rem;
+}
+.prose-hawi strong { color: var(--color-bone); font-weight: 700; }
+.prose-hawi em { font-style: italic; }
+.prose-hawi a {
+  color: var(--color-green-soft);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+.prose-hawi a:hover { color: var(--color-bone); }
+.prose-hawi ul, .prose-hawi ol {
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+.prose-hawi ul > li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+.prose-hawi ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65em;
+  width: 6px;
+  height: 6px;
+  background: var(--color-red);
+  border-radius: 1px;
+}
+.prose-hawi ol { counter-reset: item; }
+.prose-hawi ol > li {
+  position: relative;
+  padding-left: 2rem;
+  counter-increment: item;
+}
+.prose-hawi ol > li::before {
+  content: counter(item) ".";
+  position: absolute;
+  left: 0;
+  color: var(--color-red);
+  font-weight: 700;
+}
+.prose-hawi code {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.82em;
+  background: var(--color-ink-raised);
+  border: 1px solid var(--line);
+  padding: 0.12em 0.4em;
+  border-radius: 4px;
+  color: var(--color-green-soft);
+}
+.prose-hawi pre {
+  background: var(--color-ink-raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  overflow-x: auto;
+  font-size: 0.88rem;
+  line-height: 1.7;
+}
+.prose-hawi pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-bone);
+}
+.prose-hawi blockquote {
+  border-left: 3px solid var(--color-red);
+  padding-left: 1.2rem;
+  color: var(--color-bone);
+  font-style: italic;
+  font-size: 1.2rem;
+}
+.prose-hawi table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  display: block;
+  overflow-x: auto;
+}
+.prose-hawi thead { border-bottom: 1px solid var(--line-strong); }
+.prose-hawi th {
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--color-bone);
+  padding: 0.6rem 0.9rem;
+  white-space: nowrap;
+}
+.prose-hawi td {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--color-dim);
+}
+.prose-hawi tbody tr:hover {
+  background: oklch(97% 0 0 / 0.03);
+}
+.prose-hawi hr {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 2rem 0;
+}
+
+/* ---------- Explain toggle ---------- */
+.gloss, .gloss-inline { display: none; }
+
+html[data-explain="on"] .gloss {
+  display: block;
+  margin-top: 0.6rem;
+  padding: 0.1rem 0 0.1rem 0.9rem;
+  border-left: 2px solid var(--color-explain);
+  color: var(--color-explain);
+  font-style: italic;
+  font-size: 0.97rem;
+  line-height: 1.6;
+}
+html[data-explain="on"] .gloss::before {
+  content: "In plain terms: ";
+  font-style: normal;
+  font-weight: 700;
+  opacity: 0.85;
+}
+html[data-explain="on"] .gloss > p {
+  display: inline;
+  margin: 0;
+}
+html[data-explain="on"] .gloss-inline {
+  display: inline;
+  color: var(--color-explain);
+  font-style: italic;
+}
+.explain-hint { display: inline; }
+html[data-explain="on"] .explain-hint { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

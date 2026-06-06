@@ -1,0 +1,27 @@
+# Node
+node_modules/
+
+# Next.js
+site/.next/
+site/out/
+site/build/
+
+# Env files
+site/.env
+site/.env.local
+site/.env*.local
+
+# Misc
+.DS_Store
+*.pem
+npm-debug.log*
+*.tsbuildinfo
+
+# Vercel
+.vercel
+
+# Local project trackers
+progress.json
+progress.xml
+skills-lock.json
+portfolio.md
