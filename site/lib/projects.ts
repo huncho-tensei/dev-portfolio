@@ -29,8 +29,8 @@ export interface Project {
   body: string;
   /** named diagram component to render (e.g. "agency") */
   diagram?: string;
-  /** reserve a screenshot slot on the detail page */
-  screenshot?: boolean;
+  /** ordered list of image filenames in public/shots/ */
+  shots?: string[];
 }
 
 const STATUS_RANK: Record<ProjectStatus, number> = {
@@ -116,7 +116,7 @@ function readProject(slug: string): Project | null {
     stack: Array.isArray(data.stack) ? (data.stack as string[]) : [],
     links: (data.links as ProjectLinks) ?? {},
     diagram: data.diagram as string | undefined,
-    screenshot: Boolean(data.screenshot),
+    shots: Array.isArray(data.shots) ? (data.shots as string[]) : undefined,
     body: stripRedundantSections(content),
   };
 }

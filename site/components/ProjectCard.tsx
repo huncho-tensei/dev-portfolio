@@ -1,8 +1,11 @@
 import Link from "next/link";
 import type { Project } from "@/lib/projects";
 import { ArrowUpRight } from "@/components/icons";
+import { Carousel } from "@/components/Carousel";
 
 export function ProjectCard({ project }: { project: Project }) {
+  const hasShots = project.shots && project.shots.length > 0;
+
   return (
     <Link
       href={`/projects/${project.slug}`}
@@ -10,18 +13,17 @@ export function ProjectCard({ project }: { project: Project }) {
     >
       {/* Image slot */}
       <div className="relative aspect-[16/10] overflow-hidden rounded-xl bg-[var(--color-surface)]">
-        {/*
-          SCREENSHOT SLOT — drop site/public/shots/<slug>.png and replace with:
-          <Image src={`/shots/${project.slug}.png`} alt={project.title} fill className="object-cover" />
-        */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-sm font-medium text-[var(--color-faint)]">
-            {project.title}
-          </span>
-        </div>
-        {/* top-left category tag */}
+        {hasShots ? (
+          <Carousel images={project.shots!} alt={project.title} />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="font-display text-sm font-medium text-[var(--color-faint)]">
+              {project.title}
+            </span>
+          </div>
+        )}
         {project.domain && (
-          <span className="absolute left-3 top-3 rounded-md bg-[var(--color-ink-raised)] px-2.5 py-1 font-display text-xs font-medium text-[var(--color-dim)]">
+          <span className="absolute left-3 top-3 z-10 rounded-md bg-[var(--color-ink-raised)] px-2.5 py-1 font-display text-xs font-medium text-[var(--color-dim)]">
             {project.domain}
           </span>
         )}
@@ -30,8 +32,10 @@ export function ProjectCard({ project }: { project: Project }) {
       {/* Details */}
       <div className="flex flex-col justify-between">
         <div>
-          <h3 className="font-display font-bold leading-tight tracking-[-0.02em] text-[var(--color-bone)] transition-colors group-hover:text-[var(--color-red)]"
-            style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)" }}>
+          <h3
+            className="font-display font-bold leading-tight tracking-[-0.02em] text-[var(--color-bone)] transition-colors group-hover:text-[var(--color-red)]"
+            style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)" }}
+          >
             {project.title}
           </h3>
           <p className="mt-4 font-display text-base leading-relaxed text-[var(--color-dim)]">
@@ -45,7 +49,9 @@ export function ProjectCard({ project }: { project: Project }) {
               <span className="text-[var(--color-faint)]">Year</span>
               <span className="text-[var(--color-dim)]">{project.year}</span>
               <span className="text-[var(--color-faint)]">Stack</span>
-              <span className="text-[var(--color-dim)] leading-snug">{project.stack.slice(0, 3).join(", ")}</span>
+              <span className="text-[var(--color-dim)] leading-snug">
+                {project.stack.slice(0, 3).join(", ")}
+              </span>
             </div>
           </div>
 

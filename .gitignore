@@ -25,3 +25,6 @@ progress.json
 progress.xml
 skills-lock.json
 portfolio.md
+
+# Build logs
+build.log

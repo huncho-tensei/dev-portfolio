@@ -6,7 +6,7 @@ import { StatusBadge } from "@/components/StatusBadge";
 import { ProjectLinks } from "@/components/ProjectLinks";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { AgencyDiagram } from "@/components/diagrams/AgencyDiagram";
-import { ScreenshotSlot } from "@/components/ScreenshotSlot";
+import { Carousel } from "@/components/Carousel";
 import { ArrowRight, ArrowUpRight } from "@/components/icons";
 
 export function generateStaticParams() {
@@ -80,10 +80,14 @@ export default async function ProjectPage({
       </header>
 
       {/* Visual */}
-      {(project.diagram || project.screenshot) && (
+      {(project.diagram || (project.shots && project.shots.length > 0)) && (
         <div className="mt-10 flex flex-col gap-6">
           {project.diagram === "agency" && <AgencyDiagram />}
-          {project.screenshot && <ScreenshotSlot label={`${project.title} interface`} />}
+          {!project.diagram && project.shots && project.shots.length > 0 && (
+            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-[var(--line)]">
+              <Carousel images={project.shots} alt={project.title} />
+            </div>
+          )}
         </div>
       )}
 
