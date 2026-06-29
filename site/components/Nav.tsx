@@ -54,7 +54,7 @@ export function Nav() {
             ))}
           </ul>
           <ExplainToggle />
-          <a href={site.cvHref} className="btn-ghost text-sm py-1.5 px-4">
+          <a href={site.cvHref} target="_blank" rel="noreferrer noopener" className="btn-ghost text-sm py-1.5 px-4">
             CV
           </a>
         </div>
@@ -93,7 +93,7 @@ export function Nav() {
               </li>
             ))}
           </ul>
-          <a href={site.cvHref} className="btn-ghost mt-6 w-full justify-center">
+          <a href={site.cvHref} target="_blank" rel="noreferrer noopener" className="btn-ghost mt-6 w-full justify-center">
             CV
           </a>
         </div>

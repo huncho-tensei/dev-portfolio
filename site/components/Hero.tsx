@@ -30,7 +30,7 @@ export function Hero() {
         {/* Left: statement */}
         <div>
           <motion.p variants={item} className="font-display text-sm font-medium text-[var(--color-dim)] uppercase tracking-widest">
-            Open to 2026 internships · Barcelona
+            Open to work · Barcelona
           </motion.p>
 
           <motion.h1
@@ -38,13 +38,13 @@ export function Hero() {
             className="mt-5 font-display font-bold leading-[0.95] tracking-[-0.03em] text-[var(--color-bone)] overflow-wrap-anywhere min-w-0"
             style={{ fontSize: "clamp(2.8rem, 7vw, 5.5rem)" }}
           >
-            Builder of things that actually ship.
+            Idea to production, on repeat.
           </motion.h1>
 
           <motion.div variants={item}>
             <Gloss>
-              "Ship" means it&apos;s live, being used by real people — not a
-              prototype or side project that never left my laptop.
+              "Production" means it&apos;s live and being used by real people,
+              not a prototype or side project that never left my laptop.
             </Gloss>
           </motion.div>
 
