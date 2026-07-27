@@ -57,7 +57,7 @@ The fast model and the powerful model are two versions of Claude. The fast one i
 **University**
 
 - **Dissertation Assistant** for academic work: finding sources, structuring arguments, drafting, and citations.
-- **Scholar** (early stage) is a coursework partner for my final year classes, and the first agent built on a new modular setup that splits personality from skills.
+- **Scholar** (early stage) is a coursework partner built for my degree, and the first agent built on a new modular setup that splits personality from skills.
 
 **Life planning**
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion } from "motion/react";
 import { site } from "@/lib/site";
 import { GitHubIcon, LinkedInIcon } from "@/components/icons";
@@ -52,7 +53,7 @@ export function Hero() {
             variants={item}
             className="mt-7 font-display text-lg leading-relaxed text-[var(--color-dim)] max-w-md"
           >
-            Kenyan founder and Barcelona student, shipping security tools,
+            Kenyan founder and Barcelona graduate, shipping security tools,
             prediction engines, and agent systems from idea to production.
           </motion.p>
 
@@ -74,18 +75,14 @@ export function Hero() {
         {/* Right: portrait */}
         <motion.div variants={item} className="hidden md:block">
           <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[var(--color-surface)]">
-            {/*
-              PORTRAIT SLOT — drop site/public/portrait.jpg and replace with:
-              <Image src="/portrait.jpg" alt="Hawi Oyugi" fill className="object-cover" />
-            */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-              <span className="flex h-20 w-20 items-center justify-center rounded-full border border-[var(--line-strong)] font-display text-3xl font-bold text-[var(--color-bone)]">
-                HO
-              </span>
-              <span className="font-display text-sm text-[var(--color-faint)]">
-                Portrait coming soon
-              </span>
-            </div>
+            <Image
+              src="/portrait.jpg"
+              alt="Hawi Oyugi in his Class of 2026 graduation gown"
+              fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
+              className="object-cover"
+            />
             {/* Kenyan flag accent strip at bottom */}
             <div className="absolute bottom-0 inset-x-0 flex h-1">
               <div className="flex-1 bg-[var(--color-red)]" />

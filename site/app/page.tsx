@@ -39,9 +39,8 @@ export default function Home() {
               Let&apos;s connect.
             </h2>
             <p className="mt-6 font-display text-base leading-relaxed text-[var(--color-dim)] max-w-sm">
-              Hiring for a 2026 internship in Barcelona, building something
-              interesting, or just want to compare notes? Drop a line. I read
-              everything.
+              Hiring in Barcelona, building something interesting, or just
+              want to compare notes? Drop a line. I read everything.
             </p>
             <div className="mt-8 flex flex-col gap-4">
               <a

@@ -2,7 +2,7 @@ export const site = {
   name: "Hawi Oyugi",
   shortName: "Hawi",
   // story-led hero one-liner
-  role: "Kenyan founder · Barcelona student · full time builder",
+  role: "Kenyan founder · Barcelona graduate · full time builder",
   tagline:
     "I build AI tools and ship them. Security scanners, prediction engines, agent systems, and the products in between.",
   location: "Barcelona, ES · Nairobi, KE",
