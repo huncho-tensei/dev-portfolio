@@ -28,3 +28,11 @@ portfolio.md
 
 # Build logs
 build.log
+
+# The throwaway examples the design was agreed on. Reference only.
+spike-block/
+spike-dribble/
+spike-shotchart/
+
+# Plan workspace
+.superpowers/
