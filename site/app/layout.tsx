@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   title: site.title,
   description: site.description,
   authors: [{ name: site.name }],
+  // Proves to Google Search Console that this site is Hawi's. Removing it undoes the verification.
+  verification: { google: "vDTYmAjB23ixZEgX2VgqZjglOYN7t8xzbqM2pnRKPeY" },
   openGraph: { title: site.title, description: site.description, type: "website", url: "https://hawioyugi.com" },
   twitter: { card: "summary_large_image", title: site.title, description: site.description, creator: "@paroadster" },
 };

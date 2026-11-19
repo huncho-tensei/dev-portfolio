@@ -19,6 +19,15 @@ export default function pageChecks(check, { ok, until, sleep }) {
     ok(!(await page.locator('#scroller').isVisible()), 'the empty scene frame is still taking up the page');
   });
 
+  check('search engines: Google can verify the site, and robots.txt and the sitemap point at it', {}, async (page) => {
+    ok(await page.locator('meta[name="google-site-verification"]').getAttribute('content') === 'vDTYmAjB23ixZEgX2VgqZjglOYN7t8xzbqM2pnRKPeY', 'the Google verification tag is missing or wrong');
+    const get = (path) => page.evaluate(async (p) => { const r = await fetch(p); return { status: r.status, text: await r.text() }; }, path);
+    const robots = await get('/robots.txt');
+    ok(robots.status === 200 && /Allow: \//.test(robots.text) && robots.text.includes('Sitemap: https://hawioyugi.com/sitemap.xml'), `robots.txt: ${robots.status} ${robots.text.slice(0, 80)}`);
+    const map = await get('/sitemap.xml');
+    ok(map.status === 200 && map.text.includes('<loc>https://hawioyugi.com</loc>'), `sitemap.xml: ${map.status} ${map.text.slice(0, 120)}`);
+  });
+
   check('page: the title, description and icon are set, and nothing loads from another site', {}, async (page) => {
     const other = [];
     page.on('request', (r) => { const u = new URL(r.url()); if (!['localhost', '127.0.0.1'].includes(u.hostname) && !u.hostname.endsWith('.vercel.app') && u.hostname !== 'hawioyugi.com' && u.protocol.startsWith('http')) other.push(u.hostname); });
