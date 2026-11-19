@@ -40,12 +40,12 @@ export function parseFeed(xml: string): Headline[] {
   return found.sort((a, b) => b.when - a.when).map((f) => f.headline);
 }
 
-/** The three newest takes, refreshed about hourly. An empty list if the blog cannot be read. */
+/** Every take, newest first, refreshed about hourly. An empty list if the blog cannot be read. */
 export async function getHeadlines(): Promise<Headline[]> {
   try {
     const response = await fetch(FEED, { next: { revalidate: 3600 }, signal: AbortSignal.timeout(4000) });
     if (!response.ok) return [];
-    return parseFeed(await response.text()).slice(0, 3);
+    return parseFeed(await response.text());
   } catch {
     return [];
   }

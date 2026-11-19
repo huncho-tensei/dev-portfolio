@@ -59,11 +59,11 @@ describe("getHeadlines", () => {
     expect(await getHeadlines()).toEqual([]);
   });
 
-  it("returns at most the three newest takes", async () => {
+  it("returns every take, newest first", async () => {
     const many = [1, 2, 3, 4, 5]
       .map((d) => item(`Take ${d}`, `https://inkandpixel.co/blog/t${d}`, `0${d} Nov 2026 09:00:00 GMT`, "AI doom scroll"))
       .join("");
     vi.stubGlobal("fetch", () => Promise.resolve(new Response(`<rss><channel>${many}</channel></rss>`, { status: 200 })));
-    expect((await getHeadlines()).map((h) => h.title)).toEqual(["Take 5", "Take 4", "Take 3"]);
+    expect((await getHeadlines()).map((h) => h.title)).toEqual(["Take 5", "Take 4", "Take 3", "Take 2", "Take 1"]);
   });
 });

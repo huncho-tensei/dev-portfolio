@@ -14,15 +14,18 @@ export function Block({ content, headlines }: { content: SiteContent; headlines:
   useEffect(() => {
     let dispose: (() => void) | null = null;
     let gone = false;
-    import("@/scene/index.js").then(({ mountBlock }) => {
-      if (gone || !root.current) return;
-      dispose = mountBlock(root.current, content, headlines);
-      document.body.classList.toggle("scene-on", dispose !== null);
-    });
+    // If the scene cannot start (no WebGL, or the code fails to load) the page shows its text version.
+    const noScene = () => document.body.classList.add("no-scene");
+    import("@/scene/index.js")
+      .then(({ mountBlock }) => {
+        if (gone || !root.current) return;
+        dispose = mountBlock(root.current, content, headlines);
+        if (dispose === null) noScene();
+      })
+      .catch(noScene);
     return () => {
       gone = true;
       dispose?.();
-      document.body.classList.remove("scene-on");
     };
   }, [content, headlines]);
 

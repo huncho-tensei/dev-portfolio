@@ -55,7 +55,8 @@ export type SiteContent = {
     questions: { q: string; a: string; link?: [string, string] }[];
     footer: [string, string][];
   };
-  hints: { scroll: string; pick: string; pickTouch: string; more: string };
+  /** `takes` follows a number on the newsstand card: "4 takes so far". */
+  hints: { scroll: string; pick: string; pickTouch: string; more: string; takes: string };
 };
 
 const SYSTEMS = "https://inkandpixel.co/systems";
@@ -232,5 +233,6 @@ export const site: SiteContent = {
     pick: "click it, then pick one",
     pickTouch: "tap it, then pick one",
     more: "more",
+    takes: "takes so far",
   },
 };

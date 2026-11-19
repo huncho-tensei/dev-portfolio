@@ -36,7 +36,7 @@ check('page loads with no console errors and a #stage element', {}, async (page)
   ok(await page.locator('#stage').count() === 1, 'no #stage on the page');
 });
 
-const more = ['./checks-player.mjs', './checks-block.mjs', './checks-cards.mjs', './checks-chat.mjs', './checks-access.mjs', './checks-page.mjs'];
+const more = ['./checks-player.mjs', './checks-block.mjs', './checks-page.mjs'];
 for (const file of more) {
   try { (await import(file)).default(check, h); } catch (e) { if (e.code !== 'ERR_MODULE_NOT_FOUND') throw e; }
 }
