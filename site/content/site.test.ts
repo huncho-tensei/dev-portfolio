@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { site } from "./site";
 import type { Card } from "./site";
@@ -68,6 +70,17 @@ describe("the site's words", () => {
     const roblox = site.arcade.rows!.find((r) => r.title === "One on Roblox");
     expect(roblox).toBeDefined();
     expect(roblox!.href).toBeUndefined();
+  });
+
+  it("has a picture file for every picture a card names", () => {
+    const names = new Set<string>();
+    for (const c of cards) {
+      if (c.picture) names.add(c.picture);
+      for (const r of c.rows ?? []) if (r.picture) names.add(r.picture);
+    }
+    expect(names.size).toBeGreaterThan(5);
+    const missing = [...names].filter((n) => !existsSync(join(__dirname, "..", "public", "cards", `${n}.jpg`)));
+    expect(missing).toEqual([]);
   });
 
   it("says Ink and Pixel is co-founded and opens inkandpixel.co", () => {
