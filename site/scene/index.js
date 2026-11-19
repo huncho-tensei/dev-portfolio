@@ -882,7 +882,7 @@ export function mountBlock(root, content, headlines) {
   // Scroll pulls the camera back from the court and a small neighbourhood builds itself around it.
   // Each kind of work is a building or a character. Nothing here names a client.
 
-  const view = { p: 0, pT: 0, c: 0, cT: 0, k: 1, kT: 1, f: 0, fT: 0, fH: 6, fB: new V3(), fHT: 6, fBT: new V3(), aspect: 1, startHalfH: 2.9, endHalfH: 10.4 };
+  const view = { p: 0, pT: 0, c: 0, cT: 0, k: 1, kT: 1, f: 0, fT: 0, fH: 6, fB: new V3(), fHT: 6, fBT: new V3(), fUp: -0.2, fUpT: -0.2, fSide: 0, fSideT: 0, baseH: 10, aspect: 1, startHalfH: 2.9, endHalfH: 10.4 };
   const BLOCK_END = 0.76;                       // the share of the scroll the block gets; the rest is the closing
   const easeOut3 = (t) => 1 - Math.pow(1 - clamp01(t), 3);
   const AIM0 = new V3(-0.5, 1.65, 0), AIM1 = new V3(-4.6, 0, -5.4), _aim = new V3();
@@ -899,10 +899,12 @@ export function mountBlock(root, content, headlines) {
       if (wide) _c.addScaledVector(CAM_R, 0.34 * ch * view.aspect); else _c.addScaledVector(CAM_U, -0.58 * ch);   // phones: up into the space above the chat sheet
       halfH = lerp(halfH, ch, cz); _aim.lerp(_c, cz);
     }
+    view.baseH = halfH;                           // how far out the camera is before any card pulls it in
     if (view.f > 0.001) {
-      // phone, card open: in close on the thing, its feet two fifths of the way down, the card right under it
+      // A card is locked open: in on its thing. A phone comes in close, the thing's feet two fifths of the
+      // way down with the card under it. A wide screen pushes in a little and sets the thing to one side.
       const fh = Math.min(halfH, view.fH);
-      _c.copy(view.fB).addScaledVector(CAM_U, -0.2 * fh);
+      _c.copy(view.fB).addScaledVector(CAM_U, view.fUp * fh).addScaledVector(CAM_R, view.fSide * fh * view.aspect);
       halfH = lerp(halfH, fh, view.f); _aim.lerp(_c, view.f);
     }
     const halfW = halfH * view.aspect;
@@ -1347,6 +1349,7 @@ export function mountBlock(root, content, headlines) {
     if (Math.abs(view.fT - view.f) < 0.002) view.f = view.fT;
     const glide = 1 - Math.exp(-dt * 6);
     view.fB.lerp(view.fBT, glide); view.fH += (view.fHT - view.fH) * glide;
+    view.fUp += (view.fUpT - view.fUp) * glide; view.fSide += (view.fSideT - view.fSide) * glide;
     view.k += (view.kT - view.k) * (1 - Math.exp(-dt * 4.5));
     if (Math.abs(view.kT - view.k) < 0.001) view.k = view.kT;
     if (Math.abs(view.cT - view.c) < 0.0004) view.c = view.cT;
@@ -1411,7 +1414,7 @@ export function mountBlock(root, content, headlines) {
     }
     closingAdvance();
     placeCard();
-    document.body.classList.toggle('closeup', (view.c > 0.12 && view.kT === 1) || view.fT === 1);
+    document.body.classList.toggle('closeup', (view.c > 0.12 && view.kT === 1) || (view.fT === 1 && stage.clientWidth < 561));
   }
 
   // ---------- the card: what a thing is, and a way in ----------
@@ -1420,6 +1423,7 @@ export function mountBlock(root, content, headlines) {
   const cardEl = document.getElementById('card'), cardHead = el('div', 'head'), cardBody = el('div', 'body'), leadEl = document.getElementById('lead'), leadLine = leadEl.querySelector('polyline'), leadDot = leadEl.querySelector('rect');
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   cardEl.append(cardHead, cardBody);
+  let pinSide = 1;                                    // +1: the locked thing sits left of centre, -1: right
   let switchAt = -9;                                  // when an open card last changed to another thing
   let hot = null, shown = null, pinnedCard = false, typeEl = null, typeText = '', typeAt = 0;
   const dataOf = (t) => (t === guy ? GUY_CARD : t.userData);
@@ -1522,7 +1526,11 @@ export function mountBlock(root, content, headlines) {
   function showCard(t, pin) {
     if (t !== shown) { if (shown && t && pinnedCard) switchAt = clockT; shown = t; if (t) buildCard(dataOf(t)); }
     pinnedCard = !!(t && pin);
-    if (pinnedCard) pinScroll = window.scrollY;
+    if (pinnedCard) {
+      pinScroll = window.scrollY;
+      _a.copy(t.position).project(camera);
+      pinSide = _a.x < 0 ? 1 : -1;                       // which side of the screen it is on now, so it stays there
+    }
     cardEl.classList.toggle('on', !!t);
     cardEl.classList.toggle('pinned', pinnedCard);
     leadEl.classList.toggle('on', !!t);
@@ -1554,7 +1562,8 @@ export function mountBlock(root, content, headlines) {
         view.fBT.set(shown.position.x, 0, shown.position.z);
         view.fHT = clamp(1.28 * (u.tall || 4), 4.6, 14);
         // coming in from the whole block there is nothing to glide from; from another card, blockAdvance eases across
-        if (view.f < 0.02) { view.fB.copy(view.fBT); view.fH = view.fHT; }
+        view.fUpT = -0.2; view.fSideT = 0;
+        if (view.f < 0.02) { view.fB.copy(view.fBT); view.fH = view.fHT; view.fUp = view.fUpT; view.fSide = view.fSideT; }
       }
       _a.set(shown.position.x, 0, shown.position.z).project(camera);
       const bx = Math.round((_a.x * 0.5 + 0.5) * W), by = Math.round((-_a.y * 0.5 + 0.5) * H);
@@ -1573,7 +1582,16 @@ export function mountBlock(root, content, headlines) {
       leadLine.setAttribute('points', pts.map((q) => q.map(Math.round).join(',')).join(' '));
       return;
     } else {
-      view.fT = 0; cardEl.style.maxHeight = ''; cardEl.style.opacity = ''; leadEl.style.opacity = '';
+      cardEl.style.maxHeight = ''; cardEl.style.opacity = ''; leadEl.style.opacity = '';
+      // wide screen: a card locked open by a click pushes the camera in a little; pointing never moves it
+      const pin = pinnedCard && shown !== guy;
+      view.fT = pin ? 1 : 0;
+      if (pin) {
+        view.fBT.set(shown.position.x, (u.tall || 4) * 0.45, shown.position.z);
+        view.fHT = clamp(view.baseH / 1.5, 4.2, 14);
+        view.fUpT = 0; view.fSideT = pinSide * 0.25;             // the thing sits a quarter of the way off centre, the card on its open side
+        if (view.f < 0.02) { view.fB.copy(view.fBT); view.fH = view.fHT; view.fUp = view.fUpT; view.fSide = view.fSideT; }
+      }
       const right = ax + gap + cw < W - 14 && (u.side === 'right' || ax < W * 0.5 || ax - gap - cw < 14);
       cx = right ? ax + gap : ax - gap - cw;
       const topGap = H < 520 ? 12 : 64;                          // a short screen has no room to spare above the card

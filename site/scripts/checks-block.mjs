@@ -54,6 +54,32 @@ export default function blockChecks(check, { ok, until, sleep, scrollTo, blockAt
     ok(loaded, 'the card picture did not load');
   });
 
+  check('desktop card: clicking a thing pushes the camera in a little, keeps its card on screen, and Escape pulls back out', { query: '?debug&noshot' }, async (page) => {
+    await ready(page);
+    await blockAt(page, 1); await sleep(2600);
+    const half = () => page.evaluate(() => window.__block.world.camera.top);
+    const wide = await half();
+    for (const kind of ['Systems', 'Films', 'Writing']) {
+      const at = await where(page, kind);
+      await page.mouse.click(at.x, at.y); await sleep(1700);
+      const zoomed = await half(), c = await card(page), now = await where(page, kind);
+      ok(wide / zoomed > 1.3 && wide / zoomed < 1.8, `${kind}: the camera went from ${wide.toFixed(1)} to ${zoomed.toFixed(1)} (x${(wide / zoomed).toFixed(2)}), not a slight push`);
+      ok(c.pinned && c.top >= 0 && c.bottom <= c.vh && c.left >= 0 && c.right <= c.vw, `${kind}: the card is off screen after the push`);
+      ok(now.x > 40 && now.x < c.vw - 40 && now.y > 40 && now.y < c.vh - 40, `${kind}: the thing itself left the screen`);
+      ok(now.x < c.left || now.x > c.right, `${kind}: its card is sitting on top of it`);
+      await page.keyboard.press('Escape'); await sleep(1700);
+      ok(Math.abs((await half()) - wide) < 0.05, `${kind}: the camera did not come back out after Escape`);
+    }
+  });
+
+  check('desktop card: pointing at things never moves the camera', { query: '?debug&noshot' }, async (page) => {
+    await ready(page);
+    await blockAt(page, 1); await sleep(2600);
+    const wide = await page.evaluate(() => window.__block.world.camera.top);
+    for (const kind of ['Systems', 'Games', 'Writing', 'Ink and Pixel']) { const at = await where(page, kind); await page.mouse.move(at.x, at.y); await sleep(500); }
+    ok(Math.abs((await page.evaluate(() => window.__block.world.camera.top)) - wide) < 0.01, 'hovering moved the camera');
+  });
+
   check('desktop card: the Ink and Pixel building opens inkandpixel.co in a new tab', { query: '?debug&noshot' }, async (page, ctx) => {
     await ready(page);
     await blockAt(page, 1); await sleep(2600);
