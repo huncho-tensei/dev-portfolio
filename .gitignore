@@ -36,3 +36,4 @@ spike-shotchart/
 
 # Plan workspace
 .superpowers/
+.env*
