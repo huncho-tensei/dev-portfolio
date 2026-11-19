@@ -812,7 +812,7 @@ export function mountBlock(root, content, headlines) {
       ar.H.set(lerp(ox, dx, ctrl), lerp(oy, dy, ctrl), lerp(oz, dz, ctrl));
       // wrist sits above and behind the palm when the hand is on the ball
       ar.T.set(ar.H.x + a * 0.015 * ctrl, ar.H.y + 0.05 * ctrl, ar.H.z - 0.075 * ctrl);
-      ar.S.set(a * L.shW, L.torso - 0.01, 0).applyMatrix4(tmp.m);
+      ar.S.set(a * (L.shW + 0.03), L.torso - 0.08, 0).applyMatrix4(tmp.m);   // beside the jersey and below its top edge, so no skin pokes out above the shirt
       tmp.pole.set(a, -0.15 - 0.45 * (1 - ctrl), -0.75 + 0.65 * (1 - ctrl));
       const tipDown = ctrl * (1 - contact) * (p < 0.5 ? 1 : 0.35);
       tmp.d.set(a * 0.15 * (1 - ctrl), -0.25 - 0.55 * tipDown + 0.5 * (1 - ctrl), 0.9 * ctrl + 0.2);
@@ -882,7 +882,7 @@ export function mountBlock(root, content, headlines) {
   // Scroll pulls the camera back from the court and a small neighbourhood builds itself around it.
   // Each kind of work is a building or a character. Nothing here names a client.
 
-  const view = { p: 0, pT: 0, c: 0, cT: 0, k: 1, kT: 1, f: 0, fT: 0, fH: 6, fB: new V3(), aspect: 1, startHalfH: 2.9, endHalfH: 10.4 };
+  const view = { p: 0, pT: 0, c: 0, cT: 0, k: 1, kT: 1, f: 0, fT: 0, fH: 6, fB: new V3(), fHT: 6, fBT: new V3(), aspect: 1, startHalfH: 2.9, endHalfH: 10.4 };
   const BLOCK_END = 0.76;                       // the share of the scroll the block gets; the rest is the closing
   const easeOut3 = (t) => 1 - Math.pow(1 - clamp01(t), 3);
   const AIM0 = new V3(-0.5, 1.65, 0), AIM1 = new V3(-4.6, 0, -5.4), _aim = new V3();
@@ -1345,13 +1345,24 @@ export function mountBlock(root, content, headlines) {
     view.c += (view.cT - view.c) * (1 - Math.exp(-dt * 7));
     view.f += (view.fT - view.f) * (1 - Math.exp(-dt * 6.5));
     if (Math.abs(view.fT - view.f) < 0.002) view.f = view.fT;
+    const glide = 1 - Math.exp(-dt * 6);
+    view.fB.lerp(view.fBT, glide); view.fH += (view.fHT - view.fH) * glide;
     view.k += (view.kT - view.k) * (1 - Math.exp(-dt * 4.5));
     if (Math.abs(view.kT - view.k) < 0.001) view.k = view.kT;
     if (Math.abs(view.cT - view.c) < 0.0004) view.c = view.cT;
     if (Math.abs(view.pT - view.p) < 0.0004) view.p = view.pT;
     frame();
     setStage();
-    hintEl.style.opacity = made && view.p < 0.02 ? 1 : 0;
+    const hintOn = made && view.p < 0.02;
+    hintEl.style.opacity = hintOn ? 1 : 0;
+    if (stage.clientWidth < 561) { hintEl.style.left = hintEl.style.bottom = hintEl.style.transform = ''; }
+    else if (hintOn) {
+      // on a wide screen it follows the line under the title, where the eye already is
+      const line = capP.getBoundingClientRect(), box = stage.getBoundingClientRect();
+      hintEl.style.left = `${Math.round(line.right - box.left + 18)}px`;
+      hintEl.style.bottom = `${Math.round(box.bottom - line.bottom)}px`;
+      hintEl.style.transform = 'none';
+    }
     ground.visible = view.p >= 0.015;
     groundU.uG.value.w = 0.2 + 0.8 * easeOut3(view.p / 0.5);
     for (const g of pops) {
@@ -1409,6 +1420,7 @@ export function mountBlock(root, content, headlines) {
   const cardEl = document.getElementById('card'), cardHead = el('div', 'head'), cardBody = el('div', 'body'), leadEl = document.getElementById('lead'), leadLine = leadEl.querySelector('polyline'), leadDot = leadEl.querySelector('rect');
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   cardEl.append(cardHead, cardBody);
+  let switchAt = -9;                                  // when an open card last changed to another thing
   let hot = null, shown = null, pinnedCard = false, typeEl = null, typeText = '', typeAt = 0;
   const dataOf = (t) => (t === guy ? GUY_CARD : t.userData);
 
@@ -1508,7 +1520,7 @@ export function mountBlock(root, content, headlines) {
     cardEl.classList.remove('fresh'); void cardEl.offsetWidth; cardEl.classList.add('fresh');
   }
   function showCard(t, pin) {
-    if (t !== shown) { shown = t; if (t) buildCard(dataOf(t)); }
+    if (t !== shown) { if (shown && t && pinnedCard) switchAt = clockT; shown = t; if (t) buildCard(dataOf(t)); }
     pinnedCard = !!(t && pin);
     if (pinnedCard) pinScroll = window.scrollY;
     cardEl.classList.toggle('on', !!t);
@@ -1539,8 +1551,10 @@ export function mountBlock(root, content, headlines) {
       const pin = pinnedCard;
       view.fT = pin ? 1 : 0;
       if (pin) {
-        view.fB.set(shown.position.x, 0, shown.position.z);
-        view.fH = clamp(1.28 * (u.tall || 4), 4.6, 14);
+        view.fBT.set(shown.position.x, 0, shown.position.z);
+        view.fHT = clamp(1.28 * (u.tall || 4), 4.6, 14);
+        // coming in from the whole block there is nothing to glide from; from another card, blockAdvance eases across
+        if (view.f < 0.02) { view.fB.copy(view.fBT); view.fH = view.fHT; }
       }
       _a.set(shown.position.x, 0, shown.position.z).project(camera);
       const bx = Math.round((_a.x * 0.5 + 0.5) * W), by = Math.round((-_a.y * 0.5 + 0.5) * H);
@@ -1548,11 +1562,13 @@ export function mountBlock(root, content, headlines) {
       cx = Math.round((W - cw) / 2);
       cy = Math.round(clamp(by + 0.9 * pxm + 22, H * 0.3, H * 0.56));
       cardEl.style.maxHeight = `${Math.max(140, H - cy - 16)}px`;
-      cardEl.style.opacity = pin ? clamp01((view.f - 0.55) / 0.3) : '';      // it arrives once the camera is nearly there
+      // it arrives once the camera is nearly there, whether that is from the whole block or from another card
+      const arrived = Math.min(clamp01((view.f - 0.55) / 0.3), clamp01((clockT - switchAt - 0.32) / 0.25));
+      cardEl.style.opacity = pin ? arrived : '';
       const ex = clamp(bx, cx + 20, cx + cw - 20), ty = Math.min(by + 0.35 * pxm, cy - 10);
       pts = [[ex, ty], [ex, cy]];
       leadDot.setAttribute('x', ex - 4); leadDot.setAttribute('y', ty - 4);
-      leadEl.style.opacity = pin ? clamp01((view.f - 0.55) / 0.3) : '';
+      leadEl.style.opacity = pin ? arrived : '';
       cardEl.style.transform = `translate(${cx}px, ${cy}px)`;
       leadLine.setAttribute('points', pts.map((q) => q.map(Math.round).join(',')).join(' '));
       return;
@@ -1836,6 +1852,8 @@ export function mountBlock(root, content, headlines) {
     window.__block = {
       world: { st, mv, sh, guy, ball, view, pops, closing, camera },
       closeChat, openChat,
+      // the thing whose card is showing, and where it stands
+      shown: () => (shown ? { kind: dataOf(shown).kind, x: shown.position.x, z: shown.position.z } : null),
       // where a thing is on screen, in css pixels
       where: (kind, n = 0) => {
         const g = kind === 'guy' ? guy : pops.filter((x) => x.userData.kind === kind && x.visible)[n];

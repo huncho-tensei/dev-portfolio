@@ -105,6 +105,35 @@ export default function blockChecks(check, { ok, until, sleep, scrollTo, blockAt
     ok(!(await card(page)).on, 'scrolling away did not close the card');
   });
 
+  check('phone card: tapping another thing while a card is open glides the camera there, it does not jump', { phone: true, query: '?debug&noshot' }, async (page) => {
+    await ready(page);
+    await blockAt(page, 1); await sleep(2600);
+    let at = await where(page, 'Websites', 3); await page.touchscreen.tap(at.x, at.y); await sleep(1800);
+    const first = await page.evaluate(() => window.__block.shown());
+    // how far the camera's focus is from the thing whose card is showing
+    const gap = () => page.evaluate(() => { const v = window.__block.world.view, t = window.__block.shown(); return Math.hypot(v.fB.x - t.x, v.fB.z - t.z); });
+    ok(await gap() < 0.2, 'the camera did not settle on the first thing');
+    // tap whichever neighbour is in view above the card
+    const top = (await card(page)).top;
+    let target = null;
+    for (const n of [2, 4, 1, 5]) {
+      const q = await where(page, 'Websites', n);
+      if (q && q.x > 20 && q.x < 370 && q.y > 70 && q.y < top - 20) { target = q; break; }
+    }
+    ok(target, 'no other thing is in view to tap');
+    await page.touchscreen.tap(target.x, target.y);
+    await sleep(120);
+    const now = await page.evaluate(() => window.__block.shown());
+    ok(now && Math.hypot(now.x - first.x, now.z - first.z) > 1, 'the card did not switch to the tapped thing');
+    const early = await gap();
+    ok(early > 0.8, `0.1s after the tap the camera was already ${early.toFixed(2)}m from the new thing: it jumped`);
+    await sleep(1700);
+    const late = await gap();
+    ok(late < 0.35, `the camera stopped ${late.toFixed(2)}m short of the new thing`);
+    const c = await card(page);
+    ok(c.pinned && c.top >= 0 && c.bottom <= c.vh, 'the new card is not on screen');
+  });
+
   check('phone card: tall cards show the rail and the "more" tab, short ones do not', { phone: true, query: '?debug&noshot' }, async (page) => {
     await ready(page);
     await blockAt(page, 1); await sleep(2600);

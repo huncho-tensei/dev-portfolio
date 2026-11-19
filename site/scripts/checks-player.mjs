@@ -30,6 +30,17 @@ export default function playerChecks(check, { ok, until, sleep, scrollTo }) {
     ok(bounces >= 3, `only ${bounces} bounces before the pickup`);
   });
 
+  check('desktop: the scroll hint sits beside the line under the title, not in the middle', { query: '?debug&noshot' }, async (page) => {
+    await until(page, () => window.__block && document.body.classList.contains('made'), null, 15000, 'the scene never started');
+    await sleep(900);
+    const b = await page.evaluate(() => { const r = (e) => { const x = e.getBoundingClientRect(); return { l: x.left, r: x.right, t: x.top, b: x.bottom }; };
+      return { hint: r(document.getElementById('hint')), line: r(document.querySelector('#cap p')), shown: getComputedStyle(document.getElementById('hint')).opacity, vw: innerWidth }; });
+    ok(b.shown === '1', 'the scroll hint is not showing at the top of the page');
+    ok(b.hint.l >= b.line.r && b.hint.l - b.line.r <= 40, `the hint starts ${Math.round(b.hint.l - b.line.r)}px from the end of the line`);
+    ok(b.hint.r < b.vw / 2, 'the hint reaches the middle of the screen');
+    ok(b.hint.b > b.line.t && b.hint.t < b.line.b, 'the hint is not level with the line');
+  });
+
   check('loaded part-way down: no shot, name shown at once', { query: '?debug' }, async (page) => {
     await until(page, () => window.__block, null, 15000, 'the scene never started');
     await scrollTo(page, 0.3);
