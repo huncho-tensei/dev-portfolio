@@ -50,8 +50,8 @@ export default function blockChecks(check, { ok, until, sleep, scrollTo, blockAt
     ok(await page.locator('#card .thumb img').getAttribute('src') !== first, 'hovering Mirador did not change the picture');
     const hrefs = await page.locator('#card a').evaluateAll((a) => a.map((x) => x.getAttribute('href')));
     ok(hrefs.length === 6 && hrefs.every((x) => x === 'https://inkandpixel.co/systems'), `links: ${hrefs.join(', ')}`);
-    const loaded = await page.locator('#card .thumb img').evaluate((i) => i.complete && i.naturalWidth > 0);
-    ok(loaded, 'the card picture did not load');
+    // the picture was swapped a moment ago, so give it time to arrive over a real network
+    await until(page, () => { const i = document.querySelector('#card .thumb img'); return i.complete && i.naturalWidth > 0; }, null, 8000, 'the card picture did not load');
   });
 
   check('desktop card: clicking a thing pushes the camera in a little, keeps its card on screen, and Escape pulls back out', { query: '?debug&noshot' }, async (page) => {
